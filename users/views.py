@@ -5,7 +5,6 @@ from rest_framework.authtoken.models import Token
 
 @api_view(['POST'])
 def sign_in(request):
-    print(request.data)
     if request.method == 'POST':
         print(request)
         email = request.data.get('email')

@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 class CustomUserManager(BaseUserManager):
     """
@@ -10,17 +11,18 @@ class CustomUserManager(BaseUserManager):
     """
     def create_user(self, email, password, **extra_fields):
         """
-        Create and save a User with the given email and password.
+        Creates and saves a User with the given email and password.
         """
-
-        extra_fields.setdefault('is_active', True)
-
         if not email:
-            raise ValueError(_('The Email must be set'))
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            **extra_fields
+        )
+
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password, **extra_fields):
@@ -60,6 +62,17 @@ class Users(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    def save(self, *args, **kwargs):
+        if self.is_superuser == False:
+            self.set_password(self.password)
+            super().save(*args, **kwargs)  # Call the "real" save() method.
+        else:
+            super().save(*args, **kwargs)  # Call the "real" save() method.
+
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+
 
 class UsersData(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -76,6 +89,9 @@ class UsersData(models.Model):
     class Meta:
         managed = False
         db_table = 'users'
+
+    def __str__(self):
+        return self.name
 
 class PasswordResets(models.Model):
     email = models.CharField(max_length=255)
@@ -98,6 +114,9 @@ class Permissions(models.Model):
         managed = False
         db_table = 'permissions'
 
+    def __str__(self):
+        return self.name
+
 
 class PersonalAccessTokens(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -114,6 +133,9 @@ class PersonalAccessTokens(models.Model):
         managed = False
         db_table = 'personal_access_tokens'
 
+    def __str__(self):
+        return self.name
+
 
 class Roles(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -126,6 +148,9 @@ class Roles(models.Model):
         managed = False
         db_table = 'roles'
 
+    def __str__(self):
+        return self.name
+
 
 class RolesPermissions(models.Model):
     role = models.OneToOneField(Roles, on_delete=models.DO_NOTHING, primary_key=True)
@@ -136,6 +161,8 @@ class RolesPermissions(models.Model):
         db_table = 'roles_permissions'
         unique_together = (('role', 'permission'),)
 
+    def __str__(self):
+        return self.role
 
 
 class UsersPermissions(models.Model):
@@ -147,6 +174,9 @@ class UsersPermissions(models.Model):
         db_table = 'users_permissions'
         unique_together = (('user', 'permission'),)
 
+    def __str__(self):
+        return self.user
+
 
 class UsersRoles(models.Model):
     user = models.OneToOneField(Users, models.DO_NOTHING, primary_key=True)
@@ -156,3 +186,6 @@ class UsersRoles(models.Model):
         managed = False
         db_table = 'users_roles'
         unique_together = (('user', 'role'),)
+
+    def __str__(self):
+        return self.user

@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'corsheaders',
     'api',
     'users',
@@ -105,7 +106,10 @@ DATABASES = {
         'PASSWORD': PASSWORD,
         'HOST': HOST,
         'PORT': PORT,
-    }
+        'OPTIONS': {
+            "init_command": "SET foreign_key_checks = 0;",
+        },
+    },
 }
 
 
@@ -128,6 +132,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

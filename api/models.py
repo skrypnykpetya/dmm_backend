@@ -21,6 +21,9 @@ class Trailers(models.Model):
         managed = False
         db_table = 'trailers'
 
+    def __str__(self):
+        return self.model
+
 
 class Drivers(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -51,6 +54,9 @@ class Drivers(models.Model):
     class Meta:
         managed = False
         db_table = 'drivers'
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 class FailedJobs(models.Model):
@@ -94,6 +100,9 @@ class Customers(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         managed = False
         db_table = 'customers'
@@ -113,6 +122,9 @@ class CustomerContacts(models.Model):
     class Meta:
         managed = False
         db_table = 'customer_contacts'
+
+    def __str__(self):
+        return self.name
 
 
 
@@ -135,6 +147,9 @@ class Addresses(models.Model):
         managed = False
         db_table = 'addresses'
 
+    def __str__(self):
+        return self.address
+
 class AttachmentRelations(models.Model):
     id = models.BigAutoField(primary_key=True)
     instance_type = models.CharField(max_length=255)
@@ -149,6 +164,8 @@ class AttachmentRelations(models.Model):
         managed = False
         db_table = 'attachment_relations'
 
+    def __str__(self):
+        return self.instance_type
 
 class Attachments(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -163,6 +180,9 @@ class Attachments(models.Model):
     class Meta:
         managed = False
         db_table = 'attachments'
+
+    def __str__(self):
+        return self.original_name
 
 
 class Cities(models.Model):
@@ -180,6 +200,8 @@ class Cities(models.Model):
         managed = False
         db_table = 'cities'
 
+    def __str__(self):
+        return self.name
 
 class Counties(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -192,6 +214,9 @@ class Counties(models.Model):
         managed = False
         db_table = 'counties'
 
+    def __str__(self):
+        return self.name
+
 class Dictionaries(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -203,6 +228,9 @@ class Dictionaries(models.Model):
     class Meta:
         managed = False
         db_table = 'dictionaries'
+
+    def __str__(self):
+        return self.name
 
 
 class DictionaryValues(models.Model):
@@ -218,6 +246,9 @@ class DictionaryValues(models.Model):
         managed = False
         db_table = 'dictionary_values'
 
+    def __str__(self):
+        return self.text
+
 
 class Distances(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -232,6 +263,9 @@ class Distances(models.Model):
         managed = False
         db_table = 'distances'
 
+    def __str__(self):
+        return self.distance
+
 
 class Invoices(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -245,6 +279,9 @@ class Invoices(models.Model):
     class Meta:
         managed = False
         db_table = 'invoices'
+
+    def __str__(self):
+        return self.status
 
 
 class Loads(models.Model):
@@ -272,7 +309,7 @@ class Loads(models.Model):
     delivery_time = models.CharField(max_length=255, blank=True, null=True)
     delivery_status = models.CharField(max_length=10)
     payment_status = models.CharField(max_length=9)
-    driver_status = models.CharField(max_length=10)
+    driver_status = models.CharField(max_length=20)
     reference_number = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
@@ -281,6 +318,7 @@ class Loads(models.Model):
     class Meta:
         managed = False
         db_table = 'loads'
+
 
 class PowerUnits(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -301,6 +339,9 @@ class PowerUnits(models.Model):
         managed = False
         db_table = 'power_units'
 
+    def __str__(self):
+        return self.model
+
 class States(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
@@ -311,6 +352,9 @@ class States(models.Model):
         managed = False
         db_table = 'states'
 
+    def __str__(self):
+        return self.name
+
 class Zips(models.Model):
     id = models.BigAutoField(primary_key=True)
     zip = models.TextField()
@@ -319,6 +363,9 @@ class Zips(models.Model):
     county = models.ForeignKey(Counties, related_name='county', on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return self.zip
 
     class Meta:
         managed = False
