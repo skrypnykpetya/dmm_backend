@@ -4,11 +4,40 @@ from rest_framework.decorators import api_view
 from api.models import *
 
 DRIVER_STATUS = {
-    'planned': (2, 'onLoad', 'Delivering'),
-    'pickUp': (3, 'Delivering', 'on Delivery'),
-    'delivering': (4, 'on Delivery', 'Loaded'),
-    'delivery': (5, 'Loaded', 'completed'),
-    'completed': (5, 'completed', 'completed')
+    'planned': {
+        'status': 'planned',
+        'next_status': 'pickUp',
+        'next_status_id': 2,
+        'action': 'onLoad',
+        'next_action': 'Delivering'
+    },
+    'pickUp': {
+        'status': 'pickUp',
+        'next_status': 'delivering',
+        'next_status_id' : 3,
+        'action': 'Delivering',
+        'next_action': 'on Delivery'
+    },
+    'delivering': {
+        'status': 'delivering',
+        'next_status': 'delivery',
+        'next_status_id': 4,
+        'action': 'on Delivery',
+        'next_action': 'Loaded'
+    },
+    'delivery': {
+        'status': 'delivery',
+        'next_status': 'completed',
+        'next_status_id': 5,
+        'action': 'Loaded',
+        'next_action': 'completed'
+    },
+    'completed': {
+        'status': 'completed',
+        'next_status': 'completed',
+        'next_status_id': 5,
+        'action': 'completed',
+        'next_action': 'completed'}
 }
 
 @api_view(['GET'])
@@ -20,6 +49,15 @@ def get_items(request):
 
     return JsonResponse(data, status=200, safe=False)
 
+@api_view(['GET'])
+def get_completed_items(request):
+    user = request.user
+    driver = Drivers.objects.get(user=user)
+    items = Loads.objects.filter(driver=driver, delivery_status='cancelled')
+    data = prepare_items(items, completed=True)
+
+    return JsonResponse(data, status=200, safe=False)
+
 @api_view(['POST'])
 def set_status(request):
     user = request.user
@@ -27,13 +65,13 @@ def set_status(request):
     driver = Drivers.objects.get(user=user)
     load = Loads.objects.get(driver=driver, order_number=order)
     status = DRIVER_STATUS[load.driver_status]
-    if status[1] == 'Loaded':
+    if status['action'] == 'Loaded':
         load.delivery_status = 'cancelled'
 
-    load.driver_status = status[0]
+    load.driver_status = status['next_status_id']
     load.save()
 
-    return JsonResponse({'status': load.driver_status, 'action': status[2]}, status=200)
+    return JsonResponse({'status': status['next_status'], 'action': status['next_action']}, status=200)
 
 @api_view(['POST'])
 def get_status(request):
@@ -43,14 +81,20 @@ def get_status(request):
     load = Loads.objects.get(driver=driver, order_number=order)
     status = DRIVER_STATUS[load.driver_status]
 
-    return JsonResponse({'status': load.driver_status, 'action': status[1]}, status=200)
+    return JsonResponse({'status': status['status'], 'action': status['action']}, status=200)
 
 
-def prepare_items(items):
+def prepare_items(items, completed=False):
     data = []
+
     for item in items:
-        if item.driver_status == 'completed':
-            continue
+
+        if not completed:
+            if item.delivery_status == 'cancelled':
+                continue
+        elif completed:
+            if item.delivery_status != 'cancelled':
+                continue
 
         data.append({
             'driver': f"{item.driver.first_name} {item.driver.last_name}",
