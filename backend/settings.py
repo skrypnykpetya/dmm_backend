@@ -176,3 +176,5 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
+
+STATIC_DIR = BASE_DIR / 'static'

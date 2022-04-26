@@ -182,7 +182,6 @@ class ZipsAdmin(admin.ModelAdmin):
 
 
 
-
 admin.site.register(Addresses, AddressAdmin)
 admin.site.register(AttachmentRelations, AttachmentRelationsAdmin)
 admin.site.register(Attachments, AttachmentsAdmin)
@@ -197,10 +196,7 @@ admin.site.register(Drivers, DriversAdmin)
 admin.site.register(FailedJobs, FailedJobdsAdmin)
 admin.site.register(Invoices, InvoicesAdmin)
 admin.site.register(Loads, LoadsAdmin)
-
 admin.site.register(PowerUnits, PowerUnitsAdmin)
-
-
 admin.site.register(States, StatesAdmin)
 admin.site.register(Trailers, TrailersAdmin)
 
